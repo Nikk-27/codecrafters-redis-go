@@ -139,7 +139,7 @@ func echoExecute(conn net.Conn) {
 			if result.typ == "error" {
 				fmt.Fprintf(conn, "-%s\r\n", result.bulk)
 			} else if result.typ == "string" {
-				fmt.Fprintf(conn, "+%s\r\n", result.bulk)
+				fmt.Fprintf(conn, "+%s\r\n", result.str)
 			}
 		} else {
 			fmt.Fprintf(conn, "-ERR unknown command '%s'\r\n", command)
