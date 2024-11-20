@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"bufio"
+	"strings"
 )
 
 /*
@@ -53,43 +55,29 @@ func handleConnection(conn net.Conn) {
 }
 
 func main() {
-	reader := bufio.NewReader(os.Stdin) // Read input from Codecrafters
-	for {
-		// Read a line of input
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println("ERR reading input:", err)
-			continue
+    scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		// Read input from Codecrafters
+		input := scanner.Text()
+		parts := strings.SplitN(input, " ", 2)
+
+		// Parse command and arguments
+		command := parts[0]
+		var args []Value
+		if len(parts) > 1 {
+			args = []Value{{bulk: parts[1]}}
 		}
 
-		// Trim and split the input into command and arguments
-		input = strings.TrimSpace(input)
-		parts := strings.Split(input, " ")
-
-		if len(parts) < 1 {
-			fmt.Println("ERR empty command")
-			continue
-		}
-
-		command := strings.ToUpper(parts[0])
-		args := make([]app.Value, len(parts[1:]))
-		for i, arg := range parts[1:] {
-			args[i] = app.Value{typ: "string", bulk: arg}
-		}
-
-		// Find and execute the command
-		handler, exists := app.Commands[command]
-		if !exists {
-			fmt.Println("ERR unknown command:", command)
-			continue
-		}
-
-		// Get the result and output it
-		result := handler(args)
-		if result.typ == "error" {
-			fmt.Println(result.str)
-		} else if result.typ == "string" {
-			fmt.Println(result.str)
+		// Execute the command
+		if cmdFunc, exists := Commands[command]; exists {
+			result := cmdFunc(args)
+			if result.typ == "error" {
+				fmt.Println(result.str)
+			} else {
+				fmt.Println(result.bulk)
+			}
+		} else {
+			fmt.Println("ERR unknown command")
 		}
 	}
 }
