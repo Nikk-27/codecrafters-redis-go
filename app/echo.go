@@ -3,6 +3,7 @@ package main
 // Commands map that maps command names to handler functions
 var Commands = map[string]func([]Value) Value{
     "ECHO": echo,
+    "PING": ping,
 }
 
 // echo function to handle the ECHO command

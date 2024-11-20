@@ -31,7 +31,7 @@ func main() {
 			fmt.Println("Failed to accept connection")
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
-		go handleConnection(conn)
+		// go handleConnection(conn)
 		go echoExecute(conn)
 	}
 }
