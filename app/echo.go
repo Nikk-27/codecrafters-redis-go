@@ -1,7 +1,6 @@
 package main
 
-var Commands = map[string]func([]Value) Value{
-	"ECHO":    echo
+var Commands = map[string]func([]Value) Value{"ECHO":cho,
 }
 
 func echo(args []Value) Value {
