@@ -32,7 +32,7 @@ func main() {
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
 		// go handleConnection(conn)
-		go echoExecute(conn)
+		go ccommandExecute(conn)
 	}
 }
 
@@ -112,7 +112,7 @@ func parseRESP(reader *bufio.Reader) ([]string, error) {
 }
 
 // Handle ECHO command execution
-func echoExecute(conn net.Conn) {
+func commandExecute(conn net.Conn) {
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)

@@ -16,8 +16,8 @@ func echo(args []Value) Value {
 
 // echo function to handle the ECHO command
 func ping(args []Value) Value {
-    if len(args) != 1 {
+    if len(args) != 0 {
         return Value{typ: "error", bulk: "ERR wrong number of arguments for 'echo' command"}
     }
-    return Value{typ: "string", bulk: args[0].bulk}
+    return Value{typ: "string", bulk: "PONG"}
 }
