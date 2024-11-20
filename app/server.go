@@ -32,7 +32,7 @@ func main() {
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
 		// go handleConnection(conn)
-		go ccommandExecute(conn)
+		go commandExecute(conn)
 	}
 }
 
