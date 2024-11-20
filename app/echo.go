@@ -1,7 +1,7 @@
 package main
 
 var Commands = map[string]func([]Value) Value{
-	"ECHO":    echo,
+	"ECHO":    echo
 }
 
 func echo(args []Value) Value {
