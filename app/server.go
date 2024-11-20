@@ -31,12 +31,12 @@ func main() {
 			fmt.Println("Failed to accept connection")
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
-		// go handleConnection(conn)
+		go handleConnection(conn)
 		go echoExecute(conn)
 	}
 }
 
-/*
+
 func handleConnection(conn net.Conn) {
 	defer func() {
 		conn.Close()
@@ -54,7 +54,7 @@ func handleConnection(conn net.Conn) {
 		conn.Write(message)
 	}
 }
-*/
+
 
 // Parse RESP input
 func parseRESP(reader *bufio.Reader) ([]string, error) {
