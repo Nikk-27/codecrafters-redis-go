@@ -118,6 +118,7 @@ func echoExecute(conn net.Conn) {
 	for {
 		// Parse RESP input
 		args, err := parseRESP(reader)
+		fmt.Println("Hi")
 		if err != nil {
 			fmt.Fprintf(conn, "-ERR %s\r\n", err.Error())
 			return
