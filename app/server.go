@@ -118,7 +118,6 @@ func echoExecute(conn net.Conn) {
 	for {
 		// Parse RESP input
 		args, err := parseRESP(reader)
-		fmt.Println(args)
 		if err != nil {
 			fmt.Fprintf(conn, "-ERR %s\r\n", err.Error())
 			return
@@ -130,6 +129,7 @@ func echoExecute(conn net.Conn) {
 			// Execute the command
 			commandArgs := make([]Value, len(args[1:]))
 			for i, arg := range args[1:] {
+				fmt.Println(arg)
 				commandArgs[i] = Value{typ: "string", bulk: arg}
 			}
 
