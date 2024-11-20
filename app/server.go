@@ -46,6 +46,7 @@ func main() {
 			switch message {
 			case "PING":
 				connection.Write([]byte("+PONG\r\n"))
+			default:
 			}
 		}
 	}
