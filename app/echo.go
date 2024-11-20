@@ -1,4 +1,4 @@
-package app
+package main
 
 var Commands = map[string]func([]Value) Value{
     "ECHO": echo,
