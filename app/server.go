@@ -14,6 +14,10 @@ func main() {
 		os.Exit(1)
 	}
 	defer listener.Close()
+	// defer func() {
+	// 	listener.Close()
+	// }()
+
 	fmt.Println("Listening on " + listener.Addr().String())
 	for {
 		conn, err := listener.Accept()
@@ -26,6 +30,10 @@ func main() {
 	}
 }
 func handleConnection(conn net.Conn) {
+	defer func() {
+		conn.Close()
+	}()
+	
 	message := []byte("+PONG\r\n")
 	fmt.Println("Handling connection")
 	buf := make([]byte, 1024)
