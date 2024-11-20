@@ -1,7 +1,5 @@
 package main
 
-import "sync"
-
 var Commands = map[string]func([]Value) Value{
 	"ECHO":    echo,
 }
