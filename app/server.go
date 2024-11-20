@@ -53,8 +53,43 @@ func handleConnection(conn net.Conn) {
 }
 
 func main() {
-    // Example usage of ECHO
-    args := []app.Value{{typ: "string", bulk: "Hello, World!"}}
-    result := app.Commands["ECHO"](args)
-    fmt.Println(result.str) // Output: Hello, World!
+	reader := bufio.NewReader(os.Stdin) // Read input from Codecrafters
+	for {
+		// Read a line of input
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("ERR reading input:", err)
+			continue
+		}
+
+		// Trim and split the input into command and arguments
+		input = strings.TrimSpace(input)
+		parts := strings.Split(input, " ")
+
+		if len(parts) < 1 {
+			fmt.Println("ERR empty command")
+			continue
+		}
+
+		command := strings.ToUpper(parts[0])
+		args := make([]app.Value, len(parts[1:]))
+		for i, arg := range parts[1:] {
+			args[i] = app.Value{typ: "string", bulk: arg}
+		}
+
+		// Find and execute the command
+		handler, exists := app.Commands[command]
+		if !exists {
+			fmt.Println("ERR unknown command:", command)
+			continue
+		}
+
+		// Get the result and output it
+		result := handler(args)
+		if result.typ == "error" {
+			fmt.Println(result.str)
+		} else if result.typ == "string" {
+			fmt.Println(result.str)
+		}
+	}
 }
