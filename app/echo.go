@@ -1,11 +1,5 @@
 package main
 
-// Define Value struct
-type Value struct {
-    typ  string
-    bulk string
-}
-
 // Commands map that maps command names to handler functions
 var Commands = map[string]func([]Value) Value{
     "ECHO": echo,
