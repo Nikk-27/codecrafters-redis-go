@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-/*
+
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	// Uncomment this block to pass the first stage
@@ -30,10 +30,11 @@ func main() {
 			fmt.Println("Failed to accept connection")
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
-		go handleConnection(conn)
+		// go handleConnection(conn)
+		go echoExecute(conn)
 	}
 }
-*/
+
 
 
 func handleConnection(conn net.Conn) {
@@ -54,30 +55,40 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-func main() {
-    scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		// Read input from Codecrafters
-		input := scanner.Text()
-		parts := strings.SplitN(input, " ", 2)
+func echoExecute(conn net.Conn) {
+	defer conn.Close()
 
-		// Parse command and arguments
-		command := parts[0]
-		var args []Value
-		if len(parts) > 1 {
-			args = []Value{{bulk: parts[1]}}
+	reader := bufio.NewReader(conn)
+	for {
+		// Read input from client
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Connection closed")
+			return
+		}
+
+		// Parse the command
+		parts := strings.Fields(strings.TrimSpace(line))
+		if len(parts) == 0 {
+			continue
+		}
+
+		command := strings.ToUpper(parts[0])
+		args := make([]Value, len(parts[1:]))
+		for i, arg := range parts[1:] {
+			args[i] = Value{typ: "string", bulk: arg}
 		}
 
 		// Execute the command
-		if cmdFunc, exists := Commands[command]; exists {
-			result := cmdFunc(args)
+		if handler, exists := Commands[command]; exists {
+			result := handler(args)
 			if result.typ == "error" {
-				fmt.Println(result.str)
-			} else {
-				fmt.Println(result.bulk)
+				fmt.Fprintf(conn, "-%s\r\n", result.bulk)
+			} else if result.typ == "string" {
+				fmt.Fprintf(conn, "+%s\r\n", result.bulk)
 			}
 		} else {
-			fmt.Println("ERR unknown command")
+			fmt.Fprintf(conn, "-ERR unknown command '%s'\r\n", command)
 		}
 	}
 }
