@@ -126,12 +126,12 @@ func echoExecute(conn net.Conn) {
 
 		// Check if the command exists
 		command := strings.ToUpper(args[0])
-		fmt.Println(command)
+		fmt.Println("command", command)
 		if handler, exists := Commands[command]; exists {
 			// Execute the command
 			commandArgs := make([]Value, len(args)-1)
 			for i, arg := range args[1:] {
-				fmt.Println(arg)
+				fmt.Println("arg", arg)
 				commandArgs[i] = Value{typ: "string", bulk: arg}
 				fmt.Println("commandArgs", commandArgs)
 			}
