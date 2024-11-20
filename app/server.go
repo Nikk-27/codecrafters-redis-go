@@ -6,14 +6,7 @@ import (
 	"os"
 )
 
-type Value struct {
-    typ  string
-    str  string
-    bulk string
-}
-
-var Commands = map[string]func([]Value) Value{"ECHO":echo,}
-
+/*
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	// Uncomment this block to pass the first stage
@@ -35,9 +28,11 @@ func main() {
 			fmt.Println("Failed to accept connection")
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
-		//go handleConnection(conn)
+		go handleConnection(conn)
 	}
 }
+*/
+
 
 func handleConnection(conn net.Conn) {
 	defer func() {
@@ -57,11 +52,9 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-
-
-func echo(args []Value) Value {
-	if len(args) != 1 {
-		return Value{typ: "error", str: "ERR wrong number of arguments for 'echo' command"}
-	}
-	return Value{typ: "string", str: args[0].bulk}
+func main() {
+    // Example usage of ECHO
+    args := []app.Value{{typ: "string", bulk: "Hello, World!"}}
+    result := app.Commands["ECHO"](args)
+    fmt.Println(result.str) // Output: Hello, World!
 }
