@@ -25,7 +25,6 @@ func main() {
 			fmt.Println("Failed to accept connection")
 		}
 		fmt.Println("Accepted connection from " + conn.RemoteAddr().String())
-		handleConnection(conn)
 		go handleConnection(conn)
 	}
 }
@@ -33,7 +32,7 @@ func handleConnection(conn net.Conn) {
 	defer func() {
 		conn.Close()
 	}()
-	
+
 	message := []byte("+PONG\r\n")
 	fmt.Println("Handling connection")
 	buf := make([]byte, 1024)
