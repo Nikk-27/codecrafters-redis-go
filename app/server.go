@@ -125,6 +125,7 @@ func echoExecute(conn net.Conn) {
 
 		// Check if the command exists
 		command := strings.ToUpper(args[0])
+		fmt.Println(command)
 		if handler, exists := Commands[command]; exists {
 			// Execute the command
 			commandArgs := make([]Value, len(args[1:]))
