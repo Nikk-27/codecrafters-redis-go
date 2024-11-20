@@ -129,7 +129,7 @@ func echoExecute(conn net.Conn) {
 		fmt.Println(command)
 		if handler, exists := Commands[command]; exists {
 			// Execute the command
-			commandArgs := make([]Value, len(args[1:]))
+			commandArgs := make([]Value, len(args)-1)
 			for i, arg := range args[1:] {
 				fmt.Println(arg)
 				commandArgs[i] = Value{typ: "string", bulk: arg}
