@@ -6,6 +6,7 @@ import (
 	"os"
 	"bufio"
 	"strings"
+	"strconv"
 )
 
 
@@ -36,7 +37,6 @@ func main() {
 }
 
 
-
 func handleConnection(conn net.Conn) {
 	defer func() {
 		conn.Close()
@@ -55,33 +55,84 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
+// Parse RESP input
+func parseRESP(reader *bufio.Reader) ([]string, error) {
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return nil, err
+	}
+	line = strings.TrimSpace(line)
+
+	// Check for an array start (e.g., "*2")
+	if !strings.HasPrefix(line, "*") {
+		return nil, fmt.Errorf("invalid RESP format: %s", line)
+	}
+
+	// Parse the number of arguments
+	numArgs, err := strconv.Atoi(line[1:])
+	if err != nil {
+		return nil, fmt.Errorf("invalid argument count: %s", line[1:])
+	}
+
+	// Read the arguments
+	args := make([]string, numArgs)
+	for i := 0; i < numArgs; i++ {
+		// Read the bulk string indicator (e.g., "$4")
+		sizeLine, err := reader.ReadString('\n')
+		if err != nil {
+			return nil, err
+		}
+		sizeLine = strings.TrimSpace(sizeLine)
+		if !strings.HasPrefix(sizeLine, "$") {
+			return nil, fmt.Errorf("invalid bulk string format: %s", sizeLine)
+		}
+
+		// Parse the bulk string length
+		argSize, err := strconv.Atoi(sizeLine[1:])
+		if err != nil {
+			return nil, fmt.Errorf("invalid bulk string size: %s", sizeLine[1:])
+		}
+
+		// Read the bulk string itself
+		arg := make([]byte, argSize)
+		_, err = reader.Read(arg)
+		if err != nil {
+			return nil, err
+		}
+		args[i] = string(arg)
+
+		// Read and discard the trailing \r\n
+		_, err = reader.ReadString('\n')
+		if err != nil {
+			return nil, err
+		}
+	}
+	return args, nil
+}
+
+// Handle ECHO command execution
 func echoExecute(conn net.Conn) {
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)
 	for {
-		// Read input from client
-		line, err := reader.ReadString('\n')
+		// Parse RESP input
+		args, err := parseRESP(reader)
 		if err != nil {
-			fmt.Println("Connection closed")
+			fmt.Fprintf(conn, "-ERR %s\r\n", err.Error())
 			return
 		}
 
-		// Parse the command
-		parts := strings.Fields(strings.TrimSpace(line))
-		if len(parts) == 0 {
-			continue
-		}
-
-		command := strings.ToUpper(parts[0])
-		args := make([]Value, len(parts[1:]))
-		for i, arg := range parts[1:] {
-			args[i] = Value{typ: "string", bulk: arg}
-		}
-
-		// Execute the command
+		// Check if the command exists
+		command := strings.ToUpper(args[0])
 		if handler, exists := Commands[command]; exists {
-			result := handler(args)
+			// Execute the command
+			commandArgs := make([]Value, len(args[1:]))
+			for i, arg := range args[1:] {
+				commandArgs[i] = Value{typ: "string", bulk: arg}
+			}
+
+			result := handler(commandArgs)
 			if result.typ == "error" {
 				fmt.Fprintf(conn, "-%s\r\n", result.bulk)
 			} else if result.typ == "string" {
