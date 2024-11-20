@@ -133,13 +133,15 @@ func echoExecute(conn net.Conn) {
 			for i, arg := range args[1:] {
 				fmt.Println(arg)
 				commandArgs[i] = Value{typ: "string", bulk: arg}
+				fmt.Println("commandArgs", commandArgs)
 			}
 
 			result := handler(commandArgs)
+			fmt.Println("result", result)
 			if result.typ == "error" {
 				fmt.Fprintf(conn, "-%s\r\n", result.bulk)
 			} else if result.typ == "string" {
-				fmt.Fprintf(conn, "+%s\r\n", result.str)
+				fmt.Fprintf(conn, "+%s\r\n", result.bulk)
 			}
 		} else {
 			fmt.Fprintf(conn, "-ERR unknown command '%s'\r\n", command)
